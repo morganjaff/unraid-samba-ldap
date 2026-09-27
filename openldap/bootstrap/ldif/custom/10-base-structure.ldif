@@ -9,24 +9,3 @@ ou: people
 dn: ou=groups,{{ LDAP_BASE_DN }}
 objectClass: organizationalUnit
 ou: groups
-
-# Overlay smbk5pwd : régénère automatiquement sambaNTPassword (et le hash
-# Kerberos) à chaque changement de userPassword, pour que les mots de passe
-# LDAP et SMB restent synchronisés sans script externe.
-#
-# NB: le module smbk5pwd doit être chargé et compilé dans le slapd de
-# l'image osixia/openldap (c'est le cas par défaut depuis plusieurs
-# versions). Si le chargement du module échoue au démarrage, voir le
-# README (section "Dépannage smbk5pwd") pour la marche à suivre.
-
-dn: cn=module{0},cn=config
-changetype: modify
-add: olcModuleLoad
-olcModuleLoad: smbk5pwd.so
-
-dn: olcOverlay=smbk5pwd,olcDatabase={1}mdb,cn=config
-changetype: add
-objectClass: olcOverlayConfig
-objectClass: olcSmbK5PwdConfig
-olcOverlay: smbk5pwd
-olcSmbK5PwdEnable: samba
