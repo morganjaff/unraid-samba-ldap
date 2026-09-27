@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<Container version="2">
+  <Name>samba-ldap-bridge</Name>
+  <Repository>ghcr.io/morganjaff/samba-ldap-bridge:latest</Repository>
+  <Registry>https://github.com/morganjaff/unraid-samba-ldap/pkgs/container/samba-ldap-bridge</Registry>
+  <Network>br0</Network>
+  <MyIP/>
+  <Shell>bash</Shell>
+  <Privileged>false</Privileged>
+  <Support>https://github.com/morganjaff/unraid-samba-ldap</Support>
+  <Project>https://github.com/morganjaff/unraid-samba-ldap</Project>
+  <Overview>Serveur Samba dédié (passdb backend = ldapsam) authentifiant sur l'annuaire LDAP du homelab, en remplacement du SMB natif Unraid. Réseau en mode br0 (macvlan) recommandé pour obtenir une IP dédiée sur le LAN et éviter tout conflit de port 445 avec le SMB natif Unraid — pensez à désactiver ce dernier (Settings -> SMB) ou à le laisser uniquement sur des shares résiduels. Après ajout du conteneur, assignez-lui une adresse IP fixe dans le champ qui apparaît pour le réseau br0.</Overview>
+  <Category>Network:Other Tools:</Category>
+  <WebUI/>
+  <TemplateURL/>
+  <Icon>https://raw.githubusercontent.com/samba-team/samba/master/wafsamba/samba_wildcard.png</Icon>
+  <ExtraParams/>
+  <DateInstalled/>
+  <DonateText/>
+  <DonateLink/>
+  <Requires>openldap</Requires>
+
+  <Config Name="SMB TCP" Target="445" Default="445" Mode="tcp" Description="Port SMB principal" Type="Port" Display="always" Required="true" Mask="false">445</Config>
+  <Config Name="NetBIOS Session" Target="139" Default="139" Mode="tcp" Description="Port NetBIOS session (compat anciens clients)" Type="Port" Display="advanced" Required="false" Mask="false">139</Config>
+  <Config Name="NetBIOS Name" Target="137" Default="137" Mode="udp" Description="Port NetBIOS name service" Type="Port" Display="advanced" Required="false" Mask="false">137</Config>
+  <Config Name="NetBIOS Datagram" Target="138" Default="138" Mode="udp" Description="Port NetBIOS datagram service" Type="Port" Display="advanced" Required="false" Mask="false">138</Config>
+  <Config Name="WSDD" Target="3702" Default="3702" Mode="udp" Description="Découverte réseau Windows 10/11 (wsdd)" Type="Port" Display="advanced" Required="false" Mask="false">3702</Config>
+
+  <Config Name="Secrets Samba (persistant)" Target="/var/lib/samba/private" Default="/mnt/user/appdata/samba-ldap-bridge/private" Mode="rw" Description="secrets.tdb et autres fichiers privés de Samba" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/samba-ldap-bridge/private</Config>
+
+  <Config Name="Logs Samba" Target="/var/log/samba" Default="/mnt/user/appdata/samba-ldap-bridge/logs" Mode="rw" Description="Logs smbd/nmbd" Type="Path" Display="advanced" Required="false" Mask="false">/mnt/user/appdata/samba-ldap-bridge/logs</Config>
+
+  <Config Name="Définition des partages" Target="/etc/samba/smb-shares.conf" Default="/mnt/user/appdata/samba-ldap-bridge/smb-shares.conf" Mode="rw" Description="Fichier de partages inclus dans smb.conf (voir smb-shares.conf.example du dépôt)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/samba-ldap-bridge/smb-shares.conf</Config>
+
+  <Config Name="Shares Unraid" Target="/mnt/user" Default="/mnt/user" Mode="rw" Description="Montage des shares Unraid à exposer via ce Samba (adapter si besoin)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user</Config>
+
+  <Config Name="LDAP_URI" Target="LDAP_URI" Default="ldap://openldap:389" Mode="" Description="URI du conteneur OpenLDAP" Type="Variable" Display="always" Required="true" Mask="false">ldap://openldap:389</Config>
+
+  <Config Name="LDAP_BASE_DN" Target="LDAP_BASE_DN" Default="dc=home,dc=lan" Mode="" Description="Base DN de l'annuaire" Type="Variable" Display="always" Required="true" Mask="false">dc=home,dc=lan</Config>
+
+  <Config Name="LDAP_BIND_DN" Target="LDAP_BIND_DN" Default="cn=admin,dc=home,dc=lan" Mode="" Description="DN utilisé par nslcd et Samba pour interroger/écrire dans LDAP" Type="Variable" Display="always" Required="true" Mask="false">cn=admin,dc=home,dc=lan</Config>
+
+  <Config Name="LDAP_BIND_PASSWORD" Target="LDAP_BIND_PASSWORD" Default="" Mode="" Description="Mot de passe associé au LDAP_BIND_DN" Type="Variable" Display="always" Required="true" Mask="true"></Config>
+
+  <Config Name="LDAP_PEOPLE_OU" Target="LDAP_PEOPLE_OU" Default="ou=people" Mode="" Description="OU des comptes utilisateurs" Type="Variable" Display="advanced" Required="false" Mask="false">ou=people</Config>
+
+  <Config Name="LDAP_GROUP_OU" Target="LDAP_GROUP_OU" Default="ou=groups" Mode="" Description="OU des groupes" Type="Variable" Display="advanced" Required="false" Mask="false">ou=groups</Config>
+
+  <Config Name="SAMBA_WORKGROUP" Target="SAMBA_WORKGROUP" Default="WORKGROUP" Mode="" Description="Groupe de travail Windows" Type="Variable" Display="always" Required="false" Mask="false">WORKGROUP</Config>
+
+  <Config Name="SAMBA_NETBIOS_NAME" Target="SAMBA_NETBIOS_NAME" Default="UNRAID-SAMBA" Mode="" Description="Nom NetBIOS de ce serveur (visible dans l'explorateur réseau)" Type="Variable" Display="always" Required="false" Mask="false">UNRAID-SAMBA</Config>
+
+  <Config Name="SAMBA_SERVER_STRING" Target="SAMBA_SERVER_STRING" Default="Unraid LDAP Samba" Mode="" Description="Description du serveur" Type="Variable" Display="advanced" Required="false" Mask="false">Unraid LDAP Samba</Config>
+</Container>

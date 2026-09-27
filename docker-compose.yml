@@ -1,0 +1,67 @@
+services:
+
+  openldap:
+    image: osixia/openldap:1.5.0
+    container_name: openldap
+    hostname: ldap.${LDAP_DOMAIN:-home.lan}
+    environment:
+      LDAP_ORGANISATION: ${LDAP_ORGANISATION:-Home Lab}
+      LDAP_DOMAIN: ${LDAP_DOMAIN:-home.lan}
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:?LDAP_ADMIN_PASSWORD requis}
+      LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASSWORD:?LDAP_CONFIG_PASSWORD requis}
+      LDAP_TLS: "false"
+      LDAP_RFC2307BIS_SCHEMA: "true"
+    volumes:
+      - ./data/openldap/database:/var/lib/ldap
+      - ./data/openldap/config:/etc/ldap/slapd.d
+      - ./openldap/bootstrap/schema:/container/service/slapd/assets/config/bootstrap/schema/custom
+      - ./openldap/bootstrap/ldif/custom:/container/service/slapd/assets/config/bootstrap/ldif/custom
+    ports:
+      - "389:389"
+    restart: unless-stopped
+
+  lam:
+    image: ldapaccountmanager/lam:stable
+    container_name: lam
+    environment:
+      LAM_LANG: ${LAM_LANG:-fr_FR.UTF-8}
+    volumes:
+      - ./data/lam/config:/var/www/html/config
+      - ./data/lam/sess:/var/www/html/sess
+      - ./data/lam/tmp:/var/www/html/tmp
+    ports:
+      - "8080:80"
+    depends_on:
+      - openldap
+    restart: unless-stopped
+
+  samba-ldap:
+    build: ./samba
+    image: ghcr.io/morganjaff/samba-ldap-bridge:latest
+    container_name: samba-ldap
+    hostname: ${SAMBA_NETBIOS_NAME:-unraid-samba}
+    environment:
+      LDAP_URI: ldap://openldap:389
+      LDAP_BASE_DN: ${LDAP_BASE_DN}
+      LDAP_BIND_DN: ${LDAP_BIND_DN}
+      LDAP_BIND_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      LDAP_PEOPLE_OU: ${LDAP_PEOPLE_OU:-ou=people}
+      LDAP_GROUP_OU: ${LDAP_GROUP_OU:-ou=groups}
+      SAMBA_WORKGROUP: ${SAMBA_WORKGROUP:-WORKGROUP}
+      SAMBA_NETBIOS_NAME: ${SAMBA_NETBIOS_NAME:-UNRAID-SAMBA}
+      SAMBA_SERVER_STRING: ${SAMBA_SERVER_STRING:-Unraid LDAP Samba}
+    volumes:
+      - ./data/samba/private:/var/lib/samba/private
+      - ./data/samba/logs:/var/log/samba
+      - ./samba/smb-shares.conf.example:/etc/samba/smb-shares.conf
+      # Adapter ce mapping aux shares Unraid réels à exposer, ex:
+      # - /mnt/user:/mnt/user
+    ports:
+      - "445:445"
+      - "139:139"
+      - "137:137/udp"
+      - "138:138/udp"
+      - "3702:3702/udp"
+    depends_on:
+      - openldap
+    restart: unless-stopped

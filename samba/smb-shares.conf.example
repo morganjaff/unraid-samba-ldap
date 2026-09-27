@@ -1,0 +1,24 @@
+# Exemple de définitions de partages, à copier vers smb-shares.conf
+# (monté en volume depuis l'appdata Unraid, éditable sans reconstruire l'image).
+#
+# Rappel : pour que les permissions par utilisateur fonctionnent réellement,
+# les uidNumber/gidNumber LDAP doivent correspondre aux propriétaires réels
+# des fichiers sur le disque (voir README, section "Alignement UID/GID").
+
+[family]
+   path = /mnt/user/family
+   valid users = @family
+   write list = @family
+   read only = no
+   browseable = yes
+   create mask = 0664
+   directory mask = 0775
+
+[photos]
+   path = /mnt/user/photos
+   valid users = @family
+   write list = @family_admins
+   read only = yes
+   browseable = yes
+   create mask = 0664
+   directory mask = 0775

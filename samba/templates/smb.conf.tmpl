@@ -1,0 +1,32 @@
+[global]
+   workgroup = ${SAMBA_WORKGROUP}
+   netbios name = ${SAMBA_NETBIOS_NAME}
+   server string = ${SAMBA_SERVER_STRING}
+
+   security = user
+   passdb backend = ldapsam:${LDAP_URI}
+
+   ldap admin dn = ${LDAP_BIND_DN}
+   ldap suffix = ${LDAP_BASE_DN}
+   ldap user suffix = ${LDAP_PEOPLE_OU}
+   ldap group suffix = ${LDAP_GROUP_OU}
+   ldap idmap suffix = ${LDAP_GROUP_OU}
+   ldap ssl = no
+   ldap passwd sync = yes
+
+   # Découverte réseau côté Windows 10/11 (pas de broadcast NetBIOS natif
+   # dans un conteneur isolé) : assurée par le service wsdd lancé à côté.
+   map to guest = Bad User
+
+   log level = 1
+   log file = /var/log/samba/log.%m
+   max log size = 1000
+   load printers = no
+   printing = bsd
+   printcap name = /dev/null
+   disable spoolss = yes
+
+# Définitions des partages : fichier séparé, monté depuis l'hôte
+# (appdata Unraid) pour être éditable sans reconstruire l'image.
+# Voir samba/smb-shares.conf.example pour un modèle.
+include = /etc/samba/smb-shares.conf

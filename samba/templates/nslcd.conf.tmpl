@@ -1,0 +1,14 @@
+uid nslcd
+gid nslcd
+
+uri ${LDAP_URI}
+base ${LDAP_BASE_DN}
+binddn ${LDAP_BIND_DN}
+bindpw ${LDAP_BIND_PASSWORD}
+
+base passwd ${LDAP_PEOPLE_OU},${LDAP_BASE_DN}
+base group  ${LDAP_GROUP_OU},${LDAP_BASE_DN}
+scope sub
+
+ssl no
+tls_reqcert never
