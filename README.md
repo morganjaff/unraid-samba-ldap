@@ -57,7 +57,7 @@ GHCR) pour que le `docker pull` fonctionne depuis l'array.
    XML dans `/boot/config/plugins/dockerMan/templates-user/`). Avant le
    premier démarrage, copier `openldap/bootstrap/schema/samba.schema` et
    les fichiers de `openldap/bootstrap/ldif/custom/` vers les chemins
-   `appdata/openldap/bootstrap-schema` et `appdata/openldap/bootstrap-ldif`
+   `appdata/openldap/bootstrap/schema` et `appdata/openldap/bootstrap/ldif`
    déclarés dans le template.
 2. **LAM** : importer `unraid-templates/my-lam.xml`, démarrer, se connecter
    avec `cn=admin,<Base DN>` et le mot de passe admin LDAP, puis créer le
@@ -81,24 +81,42 @@ les SID déjà attribués à vos comptes.
 
 ### Overlay `smbk5pwd`
 
-Le LDIF `10-base-structure.ldif` active l'overlay `smbk5pwd` sur
-`olcDatabase={1}mdb,cn=config` — **cet index peut différer** selon la
-configuration exacte d'osixia/openldap. Si le chargement échoue au
-démarrage (visible dans les logs du conteneur `openldap`), listez les
-bases réelles avec :
+Le module `smbk5pwd.so` est présent dans l'image `osixia/openldap:1.5.0`, et
+`cn=module{0},cn=config` / `olcDatabase={1}mdb,cn=config` existent bien : le
+LDIF `20-samba-overlay.ldif` est donc valide tel quel.
+
+**Limite à connaître :** l'overlay ne se déclenche que sur l'opération
+étendue *Password Modify* (RFC 3062), utilisée par `ldappasswd` et les clients
+qui la supportent. Une modification directe de l'attribut `userPassword`
+(`ldapmodify`) ne régénère **pas** `sambaNTPassword`. Avec LAM, le module
+"Samba 3 account" calcule lui-même le hash NT quand on saisit le mot de
+passe dans l'onglet Samba : à tester sur un compte avant d'en créer d'autres.
+
+Vérification de l'overlay :
 
 ```
-docker exec openldap ldapsearch -Y EXTERNAL -H ldapi:/// -b cn=config \
-  "(objectClass=olcDatabaseConfig)" dn
+docker exec openldap ldapsearch -x -H ldap://localhost \
+  -D "cn=admin,cn=config" -w '<LDAP_CONFIG_PASSWORD>' \
+  -b cn=config "(olcOverlay=smbk5pwd)" dn
 ```
 
-et corrigez le DN cible dans le LDIF avant de relancer le conteneur avec
-une base de données vierge (ou appliquez le LDIF corrigé manuellement via
-`ldapmodify`).
+### Dépannage OpenLDAP (problèmes rencontrés au déploiement)
 
-Une fois l'overlay actif, tout changement de `userPassword` (via LAM, via
-`ldappasswd`, etc.) régénère automatiquement `sambaNTPassword` — c'est ce
-qui fait fonctionner le SSO sans script de synchronisation.
+- **`chown ... Read-only file system`** au démarrage : les dossiers bootstrap
+  doivent être montés en lecture/écriture (`Mode="rw"`).
+- **`sed: can't read ... replication-disable.ldif`** au redémarrage : définir
+  `LDAP_REMOVE_CONFIG_AFTER_SETUP=false`.
+- **`could not stat config file "/etc/ldap/slapd.conf"`** : `config` et
+  `database` ne sont pas dans un état cohérent. Arrêter **et supprimer** le
+  conteneur, vider **les deux** dossiers en même temps, puis le recréer.
+- **Le bootstrap "réussit" mais rien n'est créé** : vérifier que les fichiers
+  sont bien visibles dans le conteneur
+  (`docker exec openldap ls /container/service/slapd/assets/config/bootstrap/ldif/custom/`)
+  et que les chemins réels correspondent (`docker inspect openldap --format
+  '{{range .Mounts}}{{.Source}} -> {{.Destination}}{{"\n"}}{{end}}'`). Le log
+  affiche "Add custom bootstrap ldif..." même si le dossier est vide.
+- **`ldapsearch` sur `cn=config`** : se connecter avec `cn=admin,cn=config` et
+  `LDAP_CONFIG_PASSWORD`, pas avec l'admin des données.
 
 ### Alignement UID/GID
 

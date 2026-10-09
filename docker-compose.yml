@@ -11,6 +11,7 @@ services:
       LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASSWORD:?LDAP_CONFIG_PASSWORD requis}
       LDAP_TLS: "false"
       LDAP_RFC2307BIS_SCHEMA: "true"
+      LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
     volumes:
       - ./data/openldap/database:/var/lib/ldap
       - ./data/openldap/config:/etc/ldap/slapd.d

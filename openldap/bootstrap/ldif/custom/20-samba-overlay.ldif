@@ -1,11 +1,6 @@
-# Overlay smbk5pwd : régénère automatiquement sambaNTPassword (et le hash
-# Kerberos) à chaque changement de userPassword, pour que les mots de passe
-# LDAP et SMB restent synchronisés sans script externe.
-#
-# NB: le module smbk5pwd doit être chargé et compilé dans le slapd de
-# l'image osixia/openldap (c'est le cas par défaut depuis plusieurs
-# versions). Si le chargement du module échoue au démarrage, voir le
-# README (section "Dépannage smbk5pwd") pour la marche à suivre.
+# Overlay smbk5pwd : génère sambaNTPassword lors d'un changement de mot de passe
+# via l'opération étendue "Password Modify" (ldappasswd, clients LDAP qui l'utilisent).
+# Vérifié sur osixia/openldap:1.5.0 : cn=module{0} et olcDatabase={1}mdb existent.
 
 dn: cn=module{0},cn=config
 changetype: modify

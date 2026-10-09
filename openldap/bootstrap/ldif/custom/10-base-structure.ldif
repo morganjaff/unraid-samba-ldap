@@ -1,6 +1,5 @@
-# Structure de base de l'annuaire, chargée automatiquement au premier
-# démarrage par osixia/openldap (substitution {{ LDAP_BASE_DN }} gérée
-# nativement par l'image, cf. sa documentation "bootstrap ldif").
+# Structure de base de l'annuaire (entrées "add" pures, chargées via ldapadd).
+# La substitution {{ LDAP_BASE_DN }} est gérée par l'image osixia/openldap.
 
 dn: ou=people,{{ LDAP_BASE_DN }}
 objectClass: organizationalUnit
