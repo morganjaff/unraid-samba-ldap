@@ -1,7 +1,8 @@
 services:
 
   openldap:
-    image: osixia/openldap:1.5.0
+    build: ./openldap
+    image: ghcr.io/morganjaff/openldap-samba:latest
     container_name: openldap
     hostname: ldap.${LDAP_DOMAIN:-home.lan}
     environment:
@@ -10,13 +11,9 @@ services:
       LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD:?LDAP_ADMIN_PASSWORD requis}
       LDAP_CONFIG_PASSWORD: ${LDAP_CONFIG_PASSWORD:?LDAP_CONFIG_PASSWORD requis}
       LDAP_TLS: "false"
-      LDAP_RFC2307BIS_SCHEMA: "true"
-      LDAP_REMOVE_CONFIG_AFTER_SETUP: "false"
     volumes:
       - ./data/openldap/database:/var/lib/ldap
       - ./data/openldap/config:/etc/ldap/slapd.d
-      - ./openldap/bootstrap/schema:/container/service/slapd/assets/config/bootstrap/schema/custom
-      - ./openldap/bootstrap/ldif/custom:/container/service/slapd/assets/config/bootstrap/ldif/custom
     ports:
       - "389:389"
     restart: unless-stopped

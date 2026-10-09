@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>openldap</Name>
-  <Repository>osixia/openldap:1.5.0</Repository>
-  <Registry>https://hub.docker.com/r/osixia/openldap/</Registry>
+  <Repository>ghcr.io/morganjaff/openldap-samba:latest</Repository>
+  <Registry>https://github.com/morganjaff/unraid-samba-ldap/pkgs/container/openldap-samba</Registry>
   <Network>bridge</Network>
   <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
   <Support>https://github.com/morganjaff/unraid-samba-ldap</Support>
   <Project>https://github.com/morganjaff/unraid-samba-ldap</Project>
-  <Overview>Serveur OpenLDAP (image osixia/openldap) préconfiguré comme annuaire central du homelab, avec le schéma Samba (sambaSamAccount, sambaDomain...) et l'overlay smbk5pwd chargés automatiquement au premier démarrage. Sert de backend au conteneur "samba-ldap-bridge" de ce même dépôt.</Overview>
+  <Overview>Serveur OpenLDAP (image osixia/openldap enrichie) avec le schéma Samba, la structure de base (ou=people, ou=groups) et l'overlay smbk5pwd embarqués dans l'image : aucun fichier à copier à la main. Sert de backend au conteneur "samba-ldap-bridge" de ce même dépôt.</Overview>
   <Category>Network:Other Tools:</Category>
   <WebUI/>
   <TemplateURL/>
@@ -22,13 +22,9 @@
 
   <Config Name="Port LDAP" Target="389" Default="389" Mode="tcp" Description="Port LDAP en clair (LAN interne uniquement)" Type="Port" Display="always" Required="true" Mask="false">389</Config>
 
-  <Config Name="Base LDAP (données)" Target="/var/lib/ldap" Default="/mnt/user/appdata/openldap/database" Mode="rw" Description="Stockage persistant de la base LDAP (bdb/mdb)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openldap/database</Config>
+  <Config Name="Base LDAP (données)" Target="/var/lib/ldap" Default="/mnt/user/appdata/openldap/database" Mode="rw" Description="Stockage persistant de la base LDAP" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openldap/database</Config>
 
   <Config Name="Config LDAP (slapd.d)" Target="/etc/ldap/slapd.d" Default="/mnt/user/appdata/openldap/config" Mode="rw" Description="Configuration slapd persistante (cn=config)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openldap/config</Config>
-
-  <Config Name="Schéma custom (bootstrap)" Target="/container/service/slapd/assets/config/bootstrap/schema/custom" Default="/mnt/user/appdata/openldap/bootstrap/schema" Mode="rw" Description="Dossier contenant samba.schema (chargé une seule fois, au premier démarrage ; accès rw requis par le chown du script de démarrage)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openldap/bootstrap/schema</Config>
-
-  <Config Name="LDIF custom (bootstrap)" Target="/container/service/slapd/assets/config/bootstrap/ldif/custom" Default="/mnt/user/appdata/openldap/bootstrap/ldif" Mode="rw" Description="Dossier contenant les LDIF de bootstrap (structure de base + overlay smbk5pwd)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openldap/bootstrap/ldif</Config>
 
   <Config Name="LDAP_ORGANISATION" Target="LDAP_ORGANISATION" Default="Home Lab" Mode="" Description="Nom de l'organisation" Type="Variable" Display="always" Required="true" Mask="false">Home Lab</Config>
 
@@ -39,7 +35,4 @@
   <Config Name="LDAP_CONFIG_PASSWORD" Target="LDAP_CONFIG_PASSWORD" Default="" Mode="" Description="Mot de passe cn=config — à définir" Type="Variable" Display="always" Required="true" Mask="true"></Config>
 
   <Config Name="LDAP_TLS" Target="LDAP_TLS" Default="false" Mode="" Description="Activer TLS (false recommandé pour un usage strictement LAN)" Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
-
-  <Config Name="LDAP_RFC2307BIS_SCHEMA" Target="LDAP_RFC2307BIS_SCHEMA" Default="true" Mode="" Description="Active RFC2307bis (groupes imbriqués)" Type="Variable" Display="advanced" Required="false" Mask="false">true</Config>
-  <Config Name="LDAP_REMOVE_CONFIG_AFTER_SETUP" Target="LDAP_REMOVE_CONFIG_AFTER_SETUP" Default="false" Mode="" Description="Ne pas supprimer les fichiers de bootstrap après le premier démarrage (sinon le conteneur plante au redémarrage)" Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
 </Container>
