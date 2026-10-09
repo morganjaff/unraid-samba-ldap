@@ -1,10 +1,11 @@
-name: Build et publication de l'image samba-ldap-bridge
+name: Build et publication des images (samba-ldap-bridge, openldap-samba)
 
 on:
   push:
     branches: [main]
     paths:
       - 'samba/**'
+      - 'openldap/**'
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
@@ -14,6 +15,13 @@ jobs:
     permissions:
       contents: read
       packages: write
+    strategy:
+      matrix:
+        include:
+          - image: samba-ldap-bridge
+            context: ./samba
+          - image: openldap-samba
+            context: ./openldap
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -25,11 +33,11 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push
+      - name: Build & push ${{ matrix.image }}
         uses: docker/build-push-action@v6
         with:
-          context: ./samba
+          context: ${{ matrix.context }}
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/samba-ldap-bridge:latest
-            ghcr.io/${{ github.repository_owner }}/samba-ldap-bridge:${{ github.sha }}
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:latest
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.image }}:${{ github.sha }}
