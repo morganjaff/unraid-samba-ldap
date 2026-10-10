@@ -69,6 +69,23 @@ fi
 echo "[entrypoint] Enregistrement du mot de passe de bind LDAP dans secrets.tdb..."
 ( echo "$LDAP_BIND_PASSWORD" ) | smbpasswd -w "$LDAP_BIND_PASSWORD" >/dev/null
 
+# --- Alignement du SID local de Samba sur celui du domaine stocké dans LDAP ---
+# Samba conserve son propre SID dans secrets.tdb. S'il diffère de celui de l'entrée
+# sambaDomain (utilisé pour fabriquer le SID de chaque compte), l'authentification
+# échoue avec NT_STATUS_INVALID_SID ("sid ... does not belong to our domain").
+# Opération idempotente, rejouée à chaque démarrage.
+DOMAIN_SID="$(ldapsearch -x -LLL -H "$LDAP_URI" -D "$LDAP_BIND_DN" -w "$LDAP_BIND_PASSWORD" \
+  -b "$LDAP_BASE_DN" "(&(objectClass=sambaDomain)(sambaDomainName=${SAMBA_WORKGROUP}))" sambaSID \
+  | sed -n 's/^sambaSID: //p')"
+DOMAIN_SID="${DOMAIN_SID%%$'\n'*}"
+if [ -z "$DOMAIN_SID" ]; then
+  echo "[entrypoint] ERREUR : SID du domaine ${SAMBA_WORKGROUP} introuvable dans LDAP." >&2
+  exit 1
+fi
+echo "[entrypoint] Alignement du SID local de Samba sur ${DOMAIN_SID}..."
+net setlocalsid "$DOMAIN_SID"
+net setdomainsid "$DOMAIN_SID" || echo "[entrypoint] AVERTISSEMENT : net setdomainsid a échoué (non bloquant)."
+
 # --- Démarrage des services ---------------------------------------------
 echo "[entrypoint] Démarrage de nslcd..."
 nslcd
