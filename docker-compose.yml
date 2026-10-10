@@ -19,14 +19,14 @@ services:
     restart: unless-stopped
 
   lam:
-    image: ldapaccountmanager/lam:stable
+    image: ghcr.io/ldapaccountmanager/lam:stable
     container_name: lam
     environment:
+      LAM_SKIP_PRECONFIGURE: "true"
       LAM_LANG: ${LAM_LANG:-fr_FR.UTF-8}
     volumes:
-      - ./data/lam/config:/var/www/html/config
-      - ./data/lam/sess:/var/www/html/sess
-      - ./data/lam/tmp:/var/www/html/tmp
+      # Initialiser une fois avec : DEST=./data/lam/config bash lam/seed-config.sh
+      - ./data/lam/config:/var/lib/ldap-account-manager/config
     ports:
       - "8080:80"
     depends_on:
