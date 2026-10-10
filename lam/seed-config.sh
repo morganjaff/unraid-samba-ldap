@@ -52,6 +52,11 @@ sleep 2
 
 mkdir -p "$DEST"
 docker cp -L lam-seed:/var/lib/ldap-account-manager/config/. "$DEST"/
+# config.cfg est un lien symbolique vers /etc/ldap-account-manager/ dans l'image,
+# que "docker cp" ne déréférence pas : on le remplace par le vrai fichier pour que
+# les réglages généraux de LAM soient eux aussi conservés dans l'appdata.
+rm -f "$DEST/config.cfg"
+docker cp -L lam-seed:/etc/ldap-account-manager/config.cfg "$DEST/config.cfg"
 WWW_UID="$(docker exec lam-seed id -u www-data)"
 WWW_GID="$(docker exec lam-seed id -g www-data)"
 chown -R "$WWW_UID:$WWW_GID" "$DEST"
