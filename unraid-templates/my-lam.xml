@@ -11,7 +11,7 @@
   <Project>https://github.com/morganjaff/unraid-samba-ldap</Project>
   <Overview>LDAP Account Manager : interface web d'administration de l'annuaire OpenLDAP (comptes posixAccount + Samba). IMPORTANT : avant le premier démarrage, exécuter une fois lam/seed-config.sh (voir README) pour créer la configuration initiale dans le dossier appdata ; sans cela le conteneur ne sait pas s'initialiser et la configuration ne serait pas conservée.</Overview>
   <Category>Network:Other Tools:</Category>
-  <WebUI>http://[IP]:[PORT:8080]/</WebUI>
+  <WebUI>http://[IP]:[PORT:8081]/</WebUI>
   <TemplateURL/>
   <Icon>https://raw.githubusercontent.com/LDAPAccountManager/lam/master/lam/templates/lib/500_lam_logo.png</Icon>
   <ExtraParams/>
@@ -20,7 +20,7 @@
   <DonateLink/>
   <Requires>openldap</Requires>
 
-  <Config Name="Port Web UI" Target="80" Default="8080" Mode="tcp" Description="Port de l'interface web LAM" Type="Port" Display="always" Required="true" Mask="false">8080</Config>
+  <Config Name="Port Web UI" Target="80" Default="8081" Mode="tcp" Description="Port de l'interface web LAM" Type="Port" Display="always" Required="true" Mask="false">8081</Config>
 
   <Config Name="Configuration LAM" Target="/var/lib/ldap-account-manager/config" Default="/mnt/user/appdata/lam/config" Mode="rw" Description="Profils et configuration LAM (persistant). Initialisé une fois par lam/seed-config.sh" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/lam/config</Config>
 
