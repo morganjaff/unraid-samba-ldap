@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>lam</Name>
-  <Repository>ldapaccountmanager/lam:stable</Repository>
-  <Registry>https://hub.docker.com/r/ldapaccountmanager/lam/</Registry>
+  <Repository>ghcr.io/ldapaccountmanager/lam:stable</Repository>
+  <Registry>https://github.com/LDAPAccountManager/docker</Registry>
   <Network>bridge</Network>
   <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
   <Support>https://github.com/morganjaff/unraid-samba-ldap</Support>
   <Project>https://github.com/morganjaff/unraid-samba-ldap</Project>
-  <Overview>LDAP Account Manager : interface web d'administration de l'annuaire OpenLDAP (comptes posixAccount + Samba via son module Samba 3/4 Account). À utiliser pour créer/gérer les utilisateurs et groupes plutôt qu'en LDIF brut.</Overview>
+  <Overview>LDAP Account Manager : interface web d'administration de l'annuaire OpenLDAP (comptes posixAccount + Samba). IMPORTANT : avant le premier démarrage, exécuter une fois lam/seed-config.sh (voir README) pour créer la configuration initiale dans le dossier appdata ; sans cela le conteneur ne sait pas s'initialiser et la configuration ne serait pas conservée.</Overview>
   <Category>Network:Other Tools:</Category>
   <WebUI>http://[IP]:[PORT:8080]/</WebUI>
   <TemplateURL/>
@@ -22,11 +22,9 @@
 
   <Config Name="Port Web UI" Target="80" Default="8080" Mode="tcp" Description="Port de l'interface web LAM" Type="Port" Display="always" Required="true" Mask="false">8080</Config>
 
-  <Config Name="Configuration LAM" Target="/var/www/html/config" Default="/mnt/user/appdata/lam/config" Mode="rw" Description="Profils de connexion LAM (persistant)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/lam/config</Config>
+  <Config Name="Configuration LAM" Target="/var/lib/ldap-account-manager/config" Default="/mnt/user/appdata/lam/config" Mode="rw" Description="Profils et configuration LAM (persistant). Initialisé une fois par lam/seed-config.sh" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/lam/config</Config>
 
-  <Config Name="Sessions LAM" Target="/var/www/html/sess" Default="/mnt/user/appdata/lam/sess" Mode="rw" Description="Sessions PHP de LAM" Type="Path" Display="advanced" Required="true" Mask="false">/mnt/user/appdata/lam/sess</Config>
+  <Config Name="LAM_SKIP_PRECONFIGURE" Target="LAM_SKIP_PRECONFIGURE" Default="true" Mode="" Description="true = utiliser les fichiers du dossier de configuration (obligatoire avec le volume ci-dessus ; sinon l'image réécrit la config au démarrage)" Type="Variable" Display="always" Required="true" Mask="false">true</Config>
 
-  <Config Name="Tmp LAM" Target="/var/www/html/tmp" Default="/mnt/user/appdata/lam/tmp" Mode="rw" Description="Fichiers temporaires LAM" Type="Path" Display="advanced" Required="true" Mask="false">/mnt/user/appdata/lam/tmp</Config>
-
-  <Config Name="LAM_LANG" Target="LAM_LANG" Default="fr_FR.UTF-8" Mode="" Description="Langue de l'interface" Type="Variable" Display="always" Required="false" Mask="false">fr_FR.UTF-8</Config>
+  <Config Name="LAM_LANG" Target="LAM_LANG" Default="fr_FR.UTF-8" Mode="" Description="Langue de l'interface" Type="Variable" Display="advanced" Required="false" Mask="false">fr_FR.UTF-8</Config>
 </Container>
