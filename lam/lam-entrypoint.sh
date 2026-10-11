@@ -1,5 +1,7 @@
 #!/bin/bash
-# Prépare le volume de configuration LAM puis lance le démarrage officiel en www-data.
+# Prépare le volume de configuration LAM puis lance le démarrage officiel.
+# Reste en root : Apache ouvre ses logs (/dev/stdout, détenu par root) puis abaisse
+# lui-même ses processus de travail en www-data.
 set -euo pipefail
 
 CFG=/var/lib/ldap-account-manager/config
@@ -44,4 +46,4 @@ fi
 
 chown -R www-data:www-data "$CFG" /etc/ldap-account-manager
 
-exec setpriv --reuid=www-data --regid=www-data --init-groups /usr/local/bin/start.sh
+exec /usr/local/bin/start.sh

@@ -14,5 +14,5 @@ COPY lam-entrypoint.sh /usr/local/bin/lam-entrypoint.sh
 RUN chmod 755 /usr/local/bin/lam-entrypoint.sh
 
 # ENTRYPOINT (dumb-init) hérité de l'image de base ; seul le CMD change.
-# Le script démarre en root (pour préparer le volume), puis passe en www-data.
+# Le script reste en root : Apache abaisse lui-même ses workers en www-data.
 CMD ["/usr/local/bin/lam-entrypoint.sh"]
