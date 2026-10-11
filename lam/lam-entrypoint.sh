@@ -11,7 +11,11 @@ ETC_CFG=/etc/ldap-account-manager/config.cfg
 mkdir -p "$CFG"
 
 # 1) Volume vide : on y recopie les fichiers de référence (sans écraser l'existant).
+#    NB : l'image livre déjà un lam.conf par défaut, on ne peut donc pas s'en servir
+#    pour détecter une première initialisation : on retient que le volume était vide.
+FIRST_INIT=false
 if [ ! -e "$CFG/unix.sample.conf" ]; then
+  FIRST_INIT=true
   echo "[lam-entrypoint] Volume de configuration vide : copie des fichiers par défaut."
   cp -an "$DEF"/. "$CFG"/
 fi
@@ -30,10 +34,10 @@ if [ ! -L "$ETC_CFG" ] || [ "$(readlink "$ETC_CFG")" != "$CFG/config.cfg" ]; the
   ln -s "$CFG/config.cfg" "$ETC_CFG"
 fi
 
-# 3) Première initialisation (pas de lam.conf) : préconfiguration LAM à partir des
+# 3) Première initialisation (volume vide) : préconfiguration LAM à partir des
 #    variables d'environnement. Ensuite on la désactive pour ne jamais réécrire la
 #    configuration (profils, modules activés dans l'interface...).
-if [ ! -s "$CFG/lam.conf" ]; then
+if [ "$FIRST_INIT" = "true" ]; then
   if [ -z "${LAM_PASSWORD:-}" ] && [ -z "${LAM_PASSWORD_FILE:-}" ]; then
     echo "[lam-entrypoint] ERREUR : première initialisation, LAM_PASSWORD est requis." >&2
     exit 1
