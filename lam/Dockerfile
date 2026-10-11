@@ -10,6 +10,13 @@ USER root
 RUN mkdir -p /opt/lam-defaults \
  && cp -aL /var/lib/ldap-account-manager/config /opt/lam-defaults/config
 
+# start.sh modifie config.cfg avec "sed -i", qui remplace un lien symbolique par un
+# fichier ordinaire : la modification n'atteindrait alors pas le volume. Ce sed
+# (prioritaire dans le PATH le temps de start.sh) suit les liens symboliques.
+RUN mkdir -p /opt/lam-shim \
+ && printf '#!/bin/sh\nexec /bin/sed --follow-symlinks "$@"\n' > /opt/lam-shim/sed \
+ && chmod 755 /opt/lam-shim/sed
+
 COPY lam-entrypoint.sh /usr/local/bin/lam-entrypoint.sh
 RUN chmod 755 /usr/local/bin/lam-entrypoint.sh
 

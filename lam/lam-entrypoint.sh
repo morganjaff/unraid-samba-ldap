@@ -50,4 +50,5 @@ fi
 
 chown -R www-data:www-data "$CFG" /etc/ldap-account-manager
 
+export PATH=/opt/lam-shim:$PATH
 exec /usr/local/bin/start.sh
