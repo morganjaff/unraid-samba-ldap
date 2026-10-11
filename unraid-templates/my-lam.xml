@@ -1,15 +1,15 @@
 <?xml version="1.0"?>
 <Container version="2">
   <Name>lam</Name>
-  <Repository>ghcr.io/ldapaccountmanager/lam:stable</Repository>
-  <Registry>https://github.com/LDAPAccountManager/docker</Registry>
+  <Repository>ghcr.io/morganjaff/lam-samba:latest</Repository>
+  <Registry>https://github.com/morganjaff/unraid-samba-ldap/pkgs/container/lam-samba</Registry>
   <Network>bridge</Network>
   <MyIP/>
   <Shell>sh</Shell>
   <Privileged>false</Privileged>
   <Support>https://github.com/morganjaff/unraid-samba-ldap</Support>
   <Project>https://github.com/morganjaff/unraid-samba-ldap</Project>
-  <Overview>LDAP Account Manager : interface web d'administration de l'annuaire OpenLDAP (comptes posixAccount + Samba). IMPORTANT : avant le premier démarrage, exécuter une fois lam/seed-config.sh (voir README) pour créer la configuration initiale dans le dossier appdata ; sans cela le conteneur ne sait pas s'initialiser et la configuration ne serait pas conservée.</Overview>
+  <Overview>LDAP Account Manager : interface web d'administration de l'annuaire OpenLDAP (comptes posixAccount + Samba). Image dérivée qui initialise seule sa configuration au premier démarrage (LAM_PASSWORD requis) puis la conserve dans le dossier appdata. Les variables LDAP_* ne servent qu'à cette première initialisation.</Overview>
   <Category>Network:Other Tools:</Category>
   <WebUI>http://[IP]:[PORT:8081]/</WebUI>
   <TemplateURL/>
@@ -20,11 +20,21 @@
   <DonateLink/>
   <Requires>openldap</Requires>
 
-  <Config Name="Port Web UI" Target="80" Default="8081" Mode="tcp" Description="Port de l'interface web LAM" Type="Port" Display="always" Required="true" Mask="false">8081</Config>
+  <Config Name="Port Web UI" Target="80" Default="8080" Mode="tcp" Description="Port de l'interface web LAM" Type="Port" Display="always" Required="true" Mask="false">8081</Config>
 
-  <Config Name="Configuration LAM" Target="/var/lib/ldap-account-manager/config" Default="/mnt/user/appdata/lam/config" Mode="rw" Description="Profils et configuration LAM (persistant). Initialisé une fois par lam/seed-config.sh" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/lam/config</Config>
+  <Config Name="Configuration LAM" Target="/var/lib/ldap-account-manager/config" Default="/mnt/user/appdata/lam/config" Mode="rw" Description="Profils et configuration LAM (persistant), initialisé automatiquement au premier démarrage" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/lam/config</Config>
 
-  <Config Name="LAM_SKIP_PRECONFIGURE" Target="LAM_SKIP_PRECONFIGURE" Default="true" Mode="" Description="true = utiliser les fichiers du dossier de configuration (obligatoire avec le volume ci-dessus ; sinon l'image réécrit la config au démarrage)" Type="Variable" Display="always" Required="true" Mask="false">true</Config>
+  <Config Name="LAM_PASSWORD" Target="LAM_PASSWORD" Default="" Mode="" Description="Mot de passe maître LAM (à définir). Utilisé uniquement à la première initialisation" Type="Variable" Display="always" Required="true" Mask="true"></Config>
+
+  <Config Name="LDAP_SERVER" Target="LDAP_SERVER" Default="ldap://192.168.0.253:389" Mode="" Description="URI d'OpenLDAP : IP du NAS et port publié (première initialisation)" Type="Variable" Display="always" Required="true" Mask="false">ldap://IP_UNRAID_HOST:389</Config>
+
+  <Config Name="LDAP_BASE_DN" Target="LDAP_BASE_DN" Default="dc=home,dc=lan" Mode="" Description="Base DN de l'annuaire (première initialisation)" Type="Variable" Display="always" Required="true" Mask="false">dc=home,dc=lan</Config>
+
+  <Config Name="LDAP_USER" Target="LDAP_USER" Default="cn=admin,dc=home,dc=lan" Mode="" Description="DN administrateur de connexion à LAM (première initialisation)" Type="Variable" Display="always" Required="true" Mask="false">cn=admin,dc=home,dc=lan</Config>
+
+  <Config Name="LDAP_USERS_DN" Target="LDAP_USERS_DN" Default="ou=people,dc=home,dc=lan" Mode="" Description="Suffixe des utilisateurs (première initialisation)" Type="Variable" Display="advanced" Required="false" Mask="false">ou=people,dc=home,dc=lan</Config>
+
+  <Config Name="LDAP_GROUPS_DN" Target="LDAP_GROUPS_DN" Default="ou=groups,dc=home,dc=lan" Mode="" Description="Suffixe des groupes (première initialisation)" Type="Variable" Display="advanced" Required="false" Mask="false">ou=groups,dc=home,dc=lan</Config>
 
   <Config Name="LAM_LANG" Target="LAM_LANG" Default="fr_FR.UTF-8" Mode="" Description="Langue de l'interface" Type="Variable" Display="advanced" Required="false" Mask="false">fr_FR.UTF-8</Config>
 </Container>
