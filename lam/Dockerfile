@@ -17,6 +17,7 @@ RUN mkdir -p /opt/lam-shim \
  && printf '#!/bin/sh\nexec /bin/sed --follow-symlinks "$@"\n' > /opt/lam-shim/sed \
  && chmod 755 /opt/lam-shim/sed
 
+COPY lam-enable-samba.php /usr/local/bin/lam-enable-samba.php
 COPY lam-entrypoint.sh /usr/local/bin/lam-entrypoint.sh
 RUN chmod 755 /usr/local/bin/lam-entrypoint.sh
 

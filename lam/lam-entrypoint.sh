@@ -44,6 +44,13 @@ if [ "$FIRST_INIT" = "true" ]; then
   fi
   echo "[lam-entrypoint] Première initialisation de la configuration LAM."
   export LAM_SKIP_PRECONFIGURE=false
+  # Active d'emblée les modules Samba 3 (utilisateurs, groupes) et le type "Samba domains".
+  if [ -f "$CFG/lam.conf" ]; then
+    LAM_BASE="${LDAP_BASE_DN:-dc=${LDAP_DOMAIN:-my-domain.com}}"
+    LAM_BASE="${LAM_BASE//./,dc=}"
+    php /usr/local/bin/lam-enable-samba.php "$CFG/lam.conf" "$LAM_BASE" \
+      || echo "[lam-entrypoint] AVERTISSEMENT : activation des modules Samba impossible, à faire dans l'interface." >&2
+  fi
 else
   export LAM_SKIP_PRECONFIGURE=true
 fi
