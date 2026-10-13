@@ -19,13 +19,19 @@ services:
     restart: unless-stopped
 
   lam:
-    image: ghcr.io/ldapaccountmanager/lam:stable
+    build: ./lam
+    image: ghcr.io/morganjaff/lam-samba:latest
     container_name: lam
     environment:
-      LAM_SKIP_PRECONFIGURE: "true"
+      LAM_PASSWORD: ${LAM_PASSWORD:?LAM_PASSWORD requis}
+      LDAP_SERVER: ldap://openldap:389
+      LDAP_BASE_DN: ${LDAP_BASE_DN}
+      LDAP_USER: ${LDAP_BIND_DN}
+      LDAP_USERS_DN: ${LDAP_PEOPLE_OU:-ou=people},${LDAP_BASE_DN}
+      LDAP_GROUPS_DN: ${LDAP_GROUP_OU:-ou=groups},${LDAP_BASE_DN}
       LAM_LANG: ${LAM_LANG:-fr_FR.UTF-8}
     volumes:
-      # Initialiser une fois avec : DEST=./data/lam/config bash lam/seed-config.sh
+      # Initialisé automatiquement au premier démarrage
       - ./data/lam/config:/var/lib/ldap-account-manager/config
     ports:
       - "8080:80"
