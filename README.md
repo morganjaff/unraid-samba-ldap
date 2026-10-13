@@ -34,7 +34,7 @@ docker-compose.yml, .env.example   Déploiement de test hors Unraid
 
 ## Déploiement sur Unraid
 
-Ordre à respecter : OpenLDAP, puis LAM, puis Samba. Remplacez `192.168.0.253` par l'IP
+Ordre à respecter : OpenLDAP, puis LAM, puis Samba. Remplacez `IP_UNRAID_HOST` par l'IP
 de votre NAS et `dc=home,dc=lan` par votre Base DN.
 
 ### 1. OpenLDAP
@@ -49,12 +49,12 @@ Aucun fichier à copier. Le port 389 est publié sur le NAS.
 ### 2. LAM (interface d'administration)
 
 Importer `unraid-templates/my-lam.xml`, renseigner `LAM_PASSWORD` (mot de passe maître
-de LAM), vérifier `LDAP_SERVER` (`ldap://<IP du NAS>:389`) et `LDAP_BASE_DN`, puis démarrer.
+de LAM), vérifier `LDAP_SERVER` (`ldap://IP_UNRAID_HOST:389`) et `LDAP_BASE_DN`, puis démarrer.
 
 Au premier démarrage, l'image initialise seule sa configuration dans
 `/mnt/user/appdata/lam/config` et active les modules Samba 3 (utilisateurs, groupes) et le
 type de compte « Samba domains ». Ensuite elle n'y touche plus : les réglages faits dans
-l'interface sont conservés. Interface : `http://<IP du NAS>:8081/` (identifiant
+l'interface sont conservés. Interface : `http://IP_UNRAID_HOST:8081/` (identifiant
 `cn=admin,<Base DN>` et mot de passe `LDAP_ADMIN_PASSWORD`).
 
 ### 3. Samba (samba-ldap-bridge)
@@ -63,7 +63,7 @@ l'interface sont conservés. Interface : `http://<IP du NAS>:8081/` (identifiant
    tourne en réseau **Host** : il utilise l'IP du NAS et ses ports 445/139/137/138/3702, qui
    seraient sinon en conflit.
 2. Importer `unraid-templates/my-samba-ldap-bridge.xml` et renseigner :
-   - `LDAP_URI` : `ldap://<IP du NAS>:389` (le nom du conteneur ne se résout pas en mode Host) ;
+   - `LDAP_URI` : `ldap://IP_UNRAID_HOST:389` (le nom du conteneur ne se résout pas en mode Host) ;
    - `LDAP_BASE_DN`, `LDAP_BIND_DN` (`cn=admin,<Base DN>`) et `LDAP_BIND_PASSWORD` ;
    - `SAMBA_NETBIOS_NAME` : nom du serveur dans le réseau. **À choisir une fois pour toutes**
      (voir « Points de vigilance »).
@@ -97,10 +97,10 @@ l'interface sont conservés. Interface : `http://<IP du NAS>:8081/` (identifiant
 ### 6. Vérifier
 
 ```
-smbclient //<IP du NAS>/<login> -U <login>
+smbclient //IP_UNRAID_HOST/<login> -U <login>
 ```
 
-Sous Windows : `\\<IP du NAS>`, avec l'identifiant LDAP. Le NAS apparaît aussi dans la section
+Sous Windows : `\\IP_UNRAID_HOST`, avec l'identifiant LDAP. Le NAS apparaît aussi dans la section
 Réseau de l'explorateur grâce à `wsdd` (mode Host).
 
 ## Points de vigilance (à vérifier avant de considérer que c'est "fini")
