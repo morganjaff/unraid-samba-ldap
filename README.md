@@ -101,7 +101,9 @@ smbclient //IP_UNRAID_HOST/<login> -U <login>
 ```
 
 Sous Windows : `\\IP_UNRAID_HOST`, avec l'identifiant LDAP. Le NAS apparaît aussi dans la section
-Réseau de l'explorateur grâce à `wsdd` (mode Host).
+Réseau de l'explorateur grâce à `wsdd` (mode Host). Sous Linux/macOS, il apparaît dans
+`network://` / Finder grâce à l'annonce mDNS que le conteneur dépose dans le dossier Avahi
+de l'hôte (volume « Annonce mDNS » du template ; l'option mDNS d'Unraid doit rester active).
 
 ## Points de vigilance (à vérifier avant de considérer que c'est "fini")
 
