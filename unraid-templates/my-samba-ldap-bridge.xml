@@ -27,6 +27,8 @@
 
   <Config Name="Définition des partages" Target="/etc/samba/smb-shares.conf" Default="/mnt/user/appdata/samba-ldap-bridge/smb-shares.conf" Mode="rw" Description="Fichier de partages inclus dans smb.conf (voir smb-shares.conf.example du dépôt)" Type="Path" Display="always" Required="true" Mask="false"></Config>
 
+  <Config Name="Annonce mDNS (Avahi hôte)" Target="/etc/avahi/services" Default="/etc/avahi/services" Mode="rw" Description="Dossier Avahi de l'hôte : le conteneur y dépose l'annonce _smb._tcp pour que le NAS apparaisse dans network:// sous Linux/macOS. Laisser vide pour désactiver" Type="Path" Display="advanced" Required="false" Mask="false"></Config>
+
   <Config Name="Shares Unraid" Target="/mnt/user" Default="/mnt/user/users" Mode="rw" Description="Montage des shares Unraid à exposer via ce Samba (adapter si besoin)" Type="Path" Display="always" Required="true" Mask="false"></Config>
 
   <Config Name="LDAP_URI" Target="LDAP_URI" Default="ldap://IP_UNRAID_HOST:389" Mode="" Description="URI d'OpenLDAP : IP du NAS et port publié (le nom de conteneur ne se résout pas en mode Host)" Type="Variable" Display="always" Required="true" Mask="false"></Config>
@@ -45,5 +47,5 @@
 
   <Config Name="SAMBA_NETBIOS_NAME" Target="SAMBA_NETBIOS_NAME" Default="UNRAID-SAMBA" Mode="" Description="Nom NetBIOS de ce serveur (visible dans l'explorateur réseau)" Type="Variable" Display="always" Required="false" Mask="false"></Config>
 
-  <Config Name="SAMBA_SERVER_STRING" Target="SAMBA_SERVER_STRING" Default="Unraid LDAP Samba" Mode="" Description="Description du serveur" Type="Variable" Display="advanced" Required="false" Mask="false">Unraid LDAP Samba</Config>
+  <Config Name="SAMBA_SERVER_STRING" Target="SAMBA_SERVER_STRING" Default="Unraid LDAP Samba" Mode="" Description="Description du serveur" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
 </Container>
