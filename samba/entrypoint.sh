@@ -86,6 +86,23 @@ nslcd
 echo "[entrypoint] Démarrage de wsdd (découverte réseau Windows 10/11)..."
 wsdd -i "$(ip route get 1.1.1.1 2>/dev/null | awk '{print $5; exit}')" &
 
+# Annonce mDNS (Avahi) pour la découverte réseau sous Linux/macOS (network://, Finder).
+# Le conteneur n'a pas son propre Avahi : le dossier /etc/avahi/services de l'hôte est
+# monté en volume, et l'Avahi de l'hôte (Unraid : option mDNS) publie le fichier déposé.
+# Sans ce volume, l'étape est simplement ignorée.
+if [ -d /etc/avahi/services ]; then
+  echo "[entrypoint] Publication de l'annonce mDNS _smb._tcp (Avahi de l'hôte)..."
+  cat > /etc/avahi/services/smb.service <<'AVAHI'
+<?xml version="1.0" standalone='no'?>
+<!DOCTYPE service-group SYSTEM "avahi-service.dtd">
+<service-group>
+  <name replace-wildcards="yes">%h</name>
+  <service><type>_smb._tcp</type><port>445</port></service>
+  <service><type>_device-info._tcp</type><port>0</port><txt-record>model=Xserve</txt-record></service>
+</service-group>
+AVAHI
+fi
+
 echo "[entrypoint] Démarrage de nmbd..."
 nmbd -F --no-process-group &
 
