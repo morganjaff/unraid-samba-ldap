@@ -20,19 +20,19 @@
   <DonateLink/>
   <Requires/>
 
-  <Config Name="Port LDAP" Target="389" Default="389" Mode="tcp" Description="Port LDAP en clair (LAN interne uniquement)" Type="Port" Display="always" Required="true" Mask="false">389</Config>
+  <Config Name="Port LDAP" Target="389" Default="389" Mode="tcp" Description="Port LDAP en clair (LAN interne uniquement)" Type="Port" Display="always" Required="true" Mask="false"></Config>
 
-  <Config Name="Base LDAP (données)" Target="/var/lib/ldap" Default="/mnt/user/appdata/openldap/database" Mode="rw" Description="Stockage persistant de la base LDAP" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openldap/database</Config>
+  <Config Name="Base LDAP (données)" Target="/var/lib/ldap" Default="/mnt/user/appdata/openldap/database" Mode="rw" Description="Stockage persistant de la base LDAP" Type="Path" Display="always" Required="true" Mask="false"></Config>
 
-  <Config Name="Config LDAP (slapd.d)" Target="/etc/ldap/slapd.d" Default="/mnt/user/appdata/openldap/config" Mode="rw" Description="Configuration slapd persistante (cn=config)" Type="Path" Display="always" Required="true" Mask="false">/mnt/user/appdata/openldap/config</Config>
+  <Config Name="Config LDAP (slapd.d)" Target="/etc/ldap/slapd.d" Default="/mnt/user/appdata/openldap/config" Mode="rw" Description="Configuration slapd persistante (cn=config)" Type="Path" Display="always" Required="true" Mask="false"></Config>
 
-  <Config Name="LDAP_ORGANISATION" Target="LDAP_ORGANISATION" Default="Home Lab" Mode="" Description="Nom de l'organisation" Type="Variable" Display="always" Required="true" Mask="false">Home Lab</Config>
+  <Config Name="LDAP_ORGANISATION" Target="LDAP_ORGANISATION" Default="Home Lab" Mode="" Description="Nom de l'organisation" Type="Variable" Display="always" Required="true" Mask="false"></Config>
 
-  <Config Name="LDAP_DOMAIN" Target="LDAP_DOMAIN" Default="home.lan" Mode="" Description="Domaine LDAP (génère le Base DN : home.lan -> dc=home,dc=lan)" Type="Variable" Display="always" Required="true" Mask="false">home.lan</Config>
+  <Config Name="LDAP_DOMAIN" Target="LDAP_DOMAIN" Default="home.lan" Mode="" Description="Domaine LDAP (génère le Base DN : home.lan -> dc=home,dc=lan)" Type="Variable" Display="always" Required="true" Mask="false"></Config>
 
   <Config Name="LDAP_ADMIN_PASSWORD" Target="LDAP_ADMIN_PASSWORD" Default="" Mode="" Description="Mot de passe admin LDAP (cn=admin) — à définir" Type="Variable" Display="always" Required="true" Mask="true"></Config>
 
   <Config Name="LDAP_CONFIG_PASSWORD" Target="LDAP_CONFIG_PASSWORD" Default="" Mode="" Description="Mot de passe cn=config — à définir" Type="Variable" Display="always" Required="true" Mask="true"></Config>
 
-  <Config Name="LDAP_TLS" Target="LDAP_TLS" Default="false" Mode="" Description="Activer TLS (false recommandé pour un usage strictement LAN)" Type="Variable" Display="advanced" Required="false" Mask="false">false</Config>
+  <Config Name="LDAP_TLS" Target="LDAP_TLS" Default="false" Mode="" Description="Activer TLS (false recommandé pour un usage strictement LAN)" Type="Variable" Display="advanced" Required="false" Mask="false"></Config>
 </Container>
