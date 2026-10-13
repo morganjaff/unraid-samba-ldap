@@ -22,3 +22,16 @@
    browseable = yes
    create mask = 0664
    directory mask = 0775
+
+# Dossier personnel par utilisateur, créé automatiquement à la première connexion.
+# "root preexec" s'exécute en root à l'ouverture du partage : le dossier est créé
+# (une seule fois) avec pour propriétaire le uidNumber/gidNumber LDAP de l'utilisateur,
+# sans manipulation côté Unraid. Un dossier déjà existant n'est jamais modifié.
+[homes]
+   path = /mnt/user/users/%S
+   root preexec = /bin/sh -c 'd="/mnt/user/users/%U"; [ -e "$d" ] || { mkdir -p "$d" && chown %U: "$d" && chmod 700 "$d"; }'
+   valid users = %S
+   read only = no
+   browseable = no
+   create mask = 0600
+   directory mask = 0700
