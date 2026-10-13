@@ -37,29 +37,36 @@ done
 echo "[entrypoint] LDAP disponible."
 
 # --- Bootstrap de l'entrée sambaDomain (une seule fois) -----------------
-if ! ldapsearch -x -H "$LDAP_URI" -D "$LDAP_BIND_DN" -w "$LDAP_BIND_PASSWORD" \
-      -b "$LDAP_BASE_DN" "(objectClass=sambaDomain)" sambaSID 2>/dev/null | grep -q "^sambaSID:"; then
+# Pour un serveur autonome (security = user), Samba nomme son domaine d'après son
+# nom NetBIOS (et non le workgroup) et relit le SID de cette entrée LDAP à chaque
+# démarrage. L'entrée doit donc porter ce nom, sinon Samba en crée une autre avec
+# un SID différent de celui utilisé par LAM pour les comptes.
+# NE PAS changer SAMBA_NETBIOS_NAME après la création de comptes.
+DOMAIN_NAME="${SAMBA_NETBIOS_NAME^^}"
+if ! ldapsearch -x -LLL -H "$LDAP_URI" -D "$LDAP_BIND_DN" -w "$LDAP_BIND_PASSWORD" \
+      -b "$LDAP_BASE_DN" "(&(objectClass=sambaDomain)(sambaDomainName=${DOMAIN_NAME}))" sambaSID 2>/dev/null \
+      | grep -q "^sambaSID:"; then
 
-  echo "[entrypoint] Aucun domaine Samba dans LDAP : génération d'un SID et création de l'entrée sambaDomain."
+  echo "[entrypoint] Aucun domaine Samba '${DOMAIN_NAME}' dans LDAP : génération d'un SID et création de l'entrée."
   R1=$(od -An -N4 -tu4 /dev/urandom | tr -d ' ')
   R2=$(od -An -N4 -tu4 /dev/urandom | tr -d ' ')
   R3=$(od -An -N4 -tu4 /dev/urandom | tr -d ' ')
   SID="S-1-5-21-${R1}-${R2}-${R3}"
 
-  cat > /tmp/sambadomain.ldif <<EOF
-dn: sambaDomainName=${SAMBA_WORKGROUP},${LDAP_BASE_DN}
+  cat > /tmp/sambadomain.ldif <<LDIF
+dn: sambaDomainName=${DOMAIN_NAME},${LDAP_BASE_DN}
 objectClass: sambaDomain
 objectClass: top
-sambaDomainName: ${SAMBA_WORKGROUP}
+sambaDomainName: ${DOMAIN_NAME}
 sambaSID: ${SID}
 sambaAlgorithmicRidBase: 1000
-EOF
+LDIF
 
   ldapadd -x -H "$LDAP_URI" -D "$LDAP_BIND_DN" -w "$LDAP_BIND_PASSWORD" -f /tmp/sambadomain.ldif
   rm -f /tmp/sambadomain.ldif
-  echo "[entrypoint] Domaine Samba créé avec SID ${SID}."
+  echo "[entrypoint] Domaine Samba ${DOMAIN_NAME} créé avec SID ${SID}."
 else
-  echo "[entrypoint] Domaine Samba déjà présent dans LDAP, rien à faire."
+  echo "[entrypoint] Domaine Samba ${DOMAIN_NAME} déjà présent dans LDAP, rien à faire."
 fi
 
 # --- Stockage du mot de passe de bind LDAP pour Samba (secrets.tdb) -----
@@ -69,22 +76,8 @@ fi
 echo "[entrypoint] Enregistrement du mot de passe de bind LDAP dans secrets.tdb..."
 ( echo "$LDAP_BIND_PASSWORD" ) | smbpasswd -w "$LDAP_BIND_PASSWORD" >/dev/null
 
-# --- Alignement du SID local de Samba sur celui du domaine stocké dans LDAP ---
-# Samba conserve son propre SID dans secrets.tdb. S'il diffère de celui de l'entrée
-# sambaDomain (utilisé pour fabriquer le SID de chaque compte), l'authentification
-# échoue avec NT_STATUS_INVALID_SID ("sid ... does not belong to our domain").
-# Opération idempotente, rejouée à chaque démarrage.
-DOMAIN_SID="$(ldapsearch -x -LLL -H "$LDAP_URI" -D "$LDAP_BIND_DN" -w "$LDAP_BIND_PASSWORD" \
-  -b "$LDAP_BASE_DN" "(&(objectClass=sambaDomain)(sambaDomainName=${SAMBA_WORKGROUP}))" sambaSID \
-  | sed -n 's/^sambaSID: //p')"
-DOMAIN_SID="${DOMAIN_SID%%$'\n'*}"
-if [ -z "$DOMAIN_SID" ]; then
-  echo "[entrypoint] ERREUR : SID du domaine ${SAMBA_WORKGROUP} introuvable dans LDAP." >&2
-  exit 1
-fi
-echo "[entrypoint] Alignement du SID local de Samba sur ${DOMAIN_SID}..."
-net setlocalsid "$DOMAIN_SID"
-net setdomainsid "$DOMAIN_SID" || echo "[entrypoint] AVERTISSEMENT : net setdomainsid a échoué (non bloquant)."
+# Remarque : au démarrage, smbd (ldapsam) relit le SID de l'entrée sambaDomain
+# et met lui-même à jour secrets.tdb : aucun "net setlocalsid" n'est nécessaire.
 
 # --- Démarrage des services ---------------------------------------------
 echo "[entrypoint] Démarrage de nslcd..."
