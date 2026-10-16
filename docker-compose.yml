@@ -34,7 +34,7 @@ services:
       # Initialisé automatiquement au premier démarrage
       - ./data/lam/config:/var/lib/ldap-account-manager/config
     ports:
-      - "8080:80"
+      - "8081:80"
     depends_on:
       - openldap
     restart: unless-stopped

@@ -27,9 +27,11 @@
 # "root preexec" s'exécute en root à l'ouverture du partage : le dossier est créé
 # (une seule fois) avec pour propriétaire le uidNumber/gidNumber LDAP de l'utilisateur,
 # sans manipulation côté Unraid. Un dossier déjà existant n'est jamais modifié.
+# Chemins vus depuis le conteneur : avec le template Unraid, /mnt/user correspond
+# à /mnt/user/users sur l'hôte (volume « Shares Unraid »).
 [homes]
-   path = /mnt/user/users/%S
-   root preexec = /bin/sh -c 'd="/mnt/user/users/%U"; [ -e "$d" ] || { mkdir -p "$d" && chown %U: "$d" && chmod 700 "$d"; }'
+   path = /mnt/user/%S
+   root preexec = /bin/sh -c 'd="/mnt/user/%U"; [ -e "$d" ] || { mkdir -p "$d" && chown %U: "$d" && chmod 700 "$d"; }'
    valid users = %S
    read only = no
    browseable = no

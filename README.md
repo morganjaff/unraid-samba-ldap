@@ -183,17 +183,17 @@ Liste des domaines :
 
 ### Alignement UID/GID
 
-Les ACL Unix réelles sur le filesystem doivent correspondre aux
-`uidNumber`/`gidNumber` déclarés dans LDAP pour chaque compte
-(`posixAccount`/`posixGroup`, gérables depuis LAM). Après création des
-comptes, alignez la réalité disque :
+Les propriétaires des fichiers sur le disque doivent correspondre aux
+`uidNumber`/`gidNumber` déclarés dans LDAP (`posixAccount`/`posixGroup`,
+gérables depuis LAM).
 
-```
-chown -R <uid>:<gid> /mnt/user/family/<compte>
-```
-
-Sans ça, `nslcd` résout bien les noms mais les permissions Unix ne suivent
-pas les groupes LDAP déclarés dans `valid users`/`write list`.
+- **`[homes]`** : rien à faire, le dossier est créé à la première connexion
+  avec le bon uid/gid.
+- **Partages communs** : seulement si le dossier existait déjà avant (données
+  reprises d'Unraid, par exemple), lui donner le groupe LDAP concerné
+  (voir « Définir les partages »). Sans ça, `nslcd` résout bien les noms mais
+  les permissions Unix ne suivent pas les groupes déclarés dans
+  `valid users`/`write list`.
 
 ### Mot de passe de bind LDAP
 

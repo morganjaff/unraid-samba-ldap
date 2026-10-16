@@ -10,12 +10,11 @@
    ldap suffix = ${LDAP_BASE_DN}
    ldap user suffix = ${LDAP_PEOPLE_OU}
    ldap group suffix = ${LDAP_GROUP_OU}
-   ldap idmap suffix = ${LDAP_GROUP_OU}
    ldap ssl = no
    ldap passwd sync = yes
 
-   # Découverte réseau côté Windows 10/11 (pas de broadcast NetBIOS natif
-   # dans un conteneur isolé) : assurée par le service wsdd lancé à côté.
+   # Découverte réseau : wsdd (Windows 10/11) et nmbd sont lancés par
+   # l'entrypoint, le conteneur tournant en réseau Host.
    map to guest = Bad User
 
    log level = 1
